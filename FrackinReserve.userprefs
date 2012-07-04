@@ -1,0 +1,14 @@
+﻿<Properties GitUserInfo="UsingGIT">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Release|x86" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="FrackinReserve\FrackinReserve.cs">
+    <Files>
+      <File FileName="FrackinReserve\FrackinReserve.cs" Line="154" Column="3" />
+      <File FileName="FrackinReserve\AssemblyInfo.cs" Line="28" Column="1" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <AuthorInfo Name="Ryan Smyth" Email="" Copyright="Ryan Smyth" Company="Renegade Minds / Cynic.me" Trademark="" />
+</Properties>
