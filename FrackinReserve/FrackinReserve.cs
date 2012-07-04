@@ -26,7 +26,7 @@ using OpenTK.Graphics.OpenGL;
 using System.Diagnostics;
 using OpenTK;
 using System.Runtime.InteropServices;
-// It's all in here.
+// It's all in here. And working.
 namespace FrackinReserve
 {
 	public partial class FrackinReserve : Gtk.Window
