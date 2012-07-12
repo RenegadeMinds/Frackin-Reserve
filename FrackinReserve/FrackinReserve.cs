@@ -26,7 +26,8 @@ using OpenTK.Graphics.OpenGL;
 using System.Diagnostics;
 using OpenTK;
 using System.Runtime.InteropServices;
-// It's all in here. And working.
+using System.IO;
+
 namespace FrackinReserve
 {
 	public partial class FrackinReserve : Gtk.Window
@@ -218,6 +219,17 @@ namespace FrackinReserve
                 // Total up the amount lent out to people
                 runningSumOfCanLendOut += lastAmountToLendAmount - tmpFractionalReserveWithheldInBank;
 
+				// Build the HTML
+				sbHtmlTable.AppendLine( BuildHtmlRow ( i, 
+		                            lastAmountToLendAmount, 
+		                            tmpFractionalReserveWithheldInBank, 
+		                            runningSumOfCanLendOut,
+		                            runningSumOfHasLentOut,
+		                            runningSumOfFractionallyReservedFunds,
+		                            runningSumOfCustomerAccounts,
+		                            sbInterestRate.Value,
+				                    sbInterestPeriods.Value )); 
+
                 // If we are at the last iteration, do not do this. 
                 if (i < iterations)
                 {
@@ -245,7 +257,62 @@ namespace FrackinReserve
 			sbTotalInterestOnly.Value = (double)interest;
 			sbTotalInterestAndPrincipal.Value = (double)((double)interest + sbBankHasLoanedOut.Value);
             
-        }		
+			Html = sbHtmlTable.ToString ();
+        }
+
+		private string Html = string.Empty;
+
+		private string BuildHtmlRow (int     i, 
+		                             decimal lastAmountToLendAmount, 
+		                             decimal tmpFractionalReserveWithheldInBank, 
+		                             decimal runningSumOfCanLendOut,
+		                             decimal runningSumOfHasLentOut,
+		                             decimal runningSumOfFractionallyReservedFunds,
+		                             decimal runningSumOfCustomerAccounts,
+		                             double  interestRate,
+		                             double  interestPeriods)
+		{
+
+		    #region HTML
+			// Do the HTML if required:
+			StringBuilder sbHtmlTable = new StringBuilder();
+			// This creates the rows for the table. 
+			sbHtmlTable.AppendLine(
+			    string.Format(
+			    // This is a formatting string for our rows. It represents 1 row. The values below are substituted into it wherever you
+			    // see {#}, where # is some number. 
+			    "<tr><td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td><td>{4}</td><td>{5}</td><td>{6}</td><td>{7}</td><td>{8}</td></tr>", 
+			    // the iteration #
+			    i.ToString(),
+			    // amount deposited into bank by customer
+			    lastAmountToLendAmount.ToString("###,###,###,##0.00"),
+			    // amount held in reserve
+			    tmpFractionalReserveWithheldInBank.ToString("###,###,###,##0.00"),
+			    // amount currently available to lend out
+			    (lastAmountToLendAmount - tmpFractionalReserveWithheldInBank).ToString("###,###,###,##0.00"),
+			    // amount that *can* be lent out
+			    runningSumOfCanLendOut.ToString("###,###,###,##0.00"),
+			    // amount that has been lent out
+			    runningSumOfHasLentOut.ToString("###,###,###,##0.00"),
+			    // the amount that the bank has available for withdrawl
+			    runningSumOfFractionallyReservedFunds.ToString("###,###,###,##0.00"),
+			    // the amount that customers believe that they have in the bank
+			    runningSumOfCustomerAccounts.ToString("###,###,###,##0.00"),
+			    // this is the interest that can never be repaid:
+			    // F = P * (1 + r/n)^(n*t) - P
+			    // -- This one here is for 5% for 1 year
+			    //((Convert.ToDouble(runningSumOfHasLentOut) * Math.Pow(1f + 0.05f / 12f, 1 * 12)) - Convert.ToDouble(runningSumOfHasLentOut)).ToString("###,###,###,##0.00")
+			    // This does the running sum of the amount that cannot be repaid. 
+			    // It's put in a method to avoid having a big huge mess here that would only make things unreadable. 
+			    DoInterest(runningSumOfHasLentOut, Convert.ToDecimal (interestRate), 
+			           Convert.ToInt32(interestPeriods)).ToString("###,##0.00")
+			     )
+			  );
+			
+			#endregion
+			return sbHtmlTable.ToString ();
+
+		}
 
 
 		protected void OnSbReserveRequirementValueChanged (object sender, EventArgs e)
@@ -355,10 +422,187 @@ namespace FrackinReserve
             }
 
 			return times;
+		}		
+
+
+		string userAppData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) 
+			+ System.IO.Path.DirectorySeparatorChar.ToString () // This makes the path cross platform.
+			+ @"Frackin Reserve"
+			+ System.IO.Path.DirectorySeparatorChar.ToString ();  
+
+		protected void OnBtnDoHtmlClicked (object sender, EventArgs e)
+		{
+
+		#region Html stuff
+
+            // Bad bad bad - this forces the interest update in the HTML
+            // -- it's entirely because of bad programming to keep things together and make them more readable
+            DoFractionalMath();
+
+            // This assembles the HTML with the constants below, and the Html variable as it is updated in the DoFractionalMath() method above.
+            // But first, sub in the interest for the header...
+            string html1Sub = html1;
+            string ip = sbInterestPeriods.Value.ToString("###,###");
+            string ir = (sbInterestRate.Value * 100).ToString("##0.0");
+            html1Sub = html1Sub.Replace("{0}", ip).Replace("{1}", ir); 
+            // This assembles it. 
+            string result = html1Sub + Html + html2;
+            // Display the HTML if needed.
+
+                // Ensure that the folder exists
+                if (!Directory.Exists(userAppData))
+                {
+                    Directory.CreateDirectory(userAppData);
+                }
+
+                // If the file exists, delete it.
+                if (File.Exists(userAppData + "frackin-reserve-html.html"))
+                {
+                    File.Delete(userAppData + "frackin-reserve-html.html");
+                }
+                // Write the HTML file.
+                File.WriteAllText(userAppData + "frackin-reserve-html.html", result);
+                // Open the HTML file in the default program. This should be an Internet browser. 
+                try
+                {
+                    // This opens the HTML file.
+                    System.Diagnostics.Process.Start(userAppData + "frackin-reserve-html.html");
+                }
+                catch
+                {
+					ThrowHtmlError(); // Cross platform version of code below.
+					/*
+	                // If there is a file association error, let the user choose what to do. 
+	                DialogResult dr = MessageBox.Show("Your computer does not have the proper file associations to open an HTML file.\r\n\r\nYou can open it manually by double-clicking on the generated HTML file, or fix the file association problem yourself.\r\n\r\nDo you want to try to open it manually now?\r\n\r\n1) Click 'OK' to open an Windows Explorer window and open the file manually.\r\n\r\n2)Click 'Cancel' to close this error message and return to Frackin' Reserve. (You must then fix the file association problem manually to use this feature.)", "ERROR - No HTML File Association", MessageBoxButtons.OKCancel, MessageBoxIcon.Error);
+	                // If they click OK...
+	                if (dr == System.Windows.Forms.DialogResult.OK)
+	                {
+	                    try
+	                    {
+	                        // Open Windows Explorer so that they can see the file and open it themselves. 
+	                        //System.Diagnostics.Process.Start("explorer.exe", userAppData);
+	                    }
+	                    catch
+	                    {
+	                    }
+	                }
+	                */
+                }
+
+		#endregion
+
 		}
 
+		private void ThrowHtmlError()
+		{
+			MessageDialog md = new MessageDialog(this, 
+			                                     DialogFlags.DestroyWithParent,
+			                                     MessageType.Error,
+			                                     ButtonsType.YesNo,
+			                                     "Error opening HTML table.");
+			md.Title = "Open folder?";
+			md.Text = "An error occurred. It looks like your computer cannot open HTML files automatically. \r\n\r\nDo you want to open the folder with the table so that you can open it manually?\r\n\r\n* File is located in:\r\n" + userAppData;
+			int mdResult = md.Run ();
+			if (mdResult == (int)ResponseType.Yes)
+			{
+				OpenFolder();
+			}
+			md.Destroy ();
+		}
+
+		private void OpenFolder ()
+		{
+			try {
+				System.Diagnostics.Process.Start (userAppData);
+			} catch {
+			}
+		}
+		
+        /// <summary>
+        /// This section of icky HTML constants is simply so that the program can run as a stand-alone version.
+        /// It would be better to stick it in a resource, but for the sake of non-programmers it is inline here
+        /// as simple text so that they can more easily modify it. 
+		/// (There does not seem to be any RESX support in GTK#.)
+        /// </summary>
+        #region Icky, messy HTML fragments as constant strings.
+        const string html1 = @"<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.01 Transitional//EN' 'http://www.w3.org/TR/html4/loose.dtd'>
+<html>
+ <head>
+  <title> Frackin' Reserve - Fractional Reserve Banking Simulation </title>
+  <meta name='Generator' content='Ryan Smyth - Frackin Reserve - Fractional Reserve Banking Simulation'>
+  <meta name='Author' content='Ryan Smyth'>
+  <meta name='Keywords' content='Fractional reserve banking is evil'>
+  <meta name='Description' content='Fractional reserve banking is evil'>
+<style type='text/css'>
+table {
+	border-width: 1px;
+	border-spacing: 2px;
+	border-style: solid;
+	border-color: black;
+	
+	background-color: white;
+	-webkit-border-radius: 25px;
+	-moz-border-radius: 25px;
+	border-radius: 25px;
+}
+th {
+	border-width: 1px;
+	padding: 3px;
+	border-style: solid;
+	border-color: black;
+	background-color: white;
+	/*-webkit-border-radius: 25px;
+	-moz-border-radius: 25px;
+	border-radius: 25px;*/
+    background-color: #f0f0f0;
+
+}
+td {
+	border-width: 1px;
+	padding: 3px;
+	border-style: solid;
+	border-color: black;
+	background-color: white;
+	/*-webkit-border-radius: 25px;
+	-moz-border-radius: 25px;
+	border-radius: 25px;*/
+    text-align: right;
+}
+table tr:last-child td:first-child {
+-moz-border-radius-bottomleft:25px;
+-webkit-border-bottom-left-radius:25px;
+border-bottom-left-radius:25px}
+
+table tr:last-child td:last-child {
+-moz-border-radius-bottomright:25px;
+-webkit-border-bottom-right-radius:25px;
+border-bottom-right-radius:25px}
+
+  </style>
+ </head>
+ <body>
+<table cellspacing='0'>
+<tr><th>Iteration #</th><th>Deposited by<br>Customer</th>
+<th>Amount Held <br>in Reserve<br>from Deposit</th>
+<th>Amount <br>Currrently <br>Available to <br>Lend Out<br>from Deposit</th>
+<th>Total Amount that <br>&quot;Can&quot; be <br>Lent Out</th>
+<th>Total Amount that <br>Has Been <br>Lent Out</th>
+<th>Total Amount <br>Held in Reserve</th>
+<th>Total Amount that <br>Customers Believe <br>They Have</th>
+<th>Amount of <br>Interest for <br>{0} year(s) @ {1}%<br>on Loaned Money <br>CAN NEVER <br>BE REPAID! </th></tr>
+";
+        const string html2 = @"
+<tr><td colspan='9' style='text-align: center;'> <b>Fractional Reserve Banking is EVIL.</b> </td></tr>
+</table>
+ </body>
+</html>";
+        #endregion
 
 
-	}
+    }
+
+
+
+
 }
 

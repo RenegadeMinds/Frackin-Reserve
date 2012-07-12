@@ -7,9 +7,9 @@
   <import>
     <widget-library name="glade-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
     <widget-library name="../../GLWidget.dll" />
-    <widget-library name="../bin/Release/FrackinReserve.exe" internal="true" />
+    <widget-library name="../bin/Debug/FrackinReserve.exe" internal="true" />
   </import>
-  <widget class="Gtk.Window" id="FrackinReserve.FrackinReserve" design-size="528 576">
+  <widget class="Gtk.Window" id="FrackinReserve.FrackinReserve" design-size="528 597">
     <property name="MemberName" />
     <property name="Title" translatable="yes">Frackin' Reserve - Fractional reserve banking simulator</property>
     <property name="Icon">stock:gtk-about Menu</property>
@@ -49,10 +49,35 @@
         <child>
           <widget class="Gtk.Table" id="table2">
             <property name="MemberName" />
-            <property name="NRows">17</property>
+            <property name="NRows">18</property>
             <property name="NColumns">2</property>
             <property name="RowSpacing">6</property>
             <property name="ColumnSpacing">6</property>
+            <child>
+              <widget class="Gtk.Button" id="btnDoHtml">
+                <property name="MemberName" />
+                <property name="CanFocus">True</property>
+                <property name="Type">TextOnly</property>
+                <property name="Label" translatable="yes">Show me in a table</property>
+                <property name="UseUnderline">True</property>
+                <signal name="Clicked" handler="OnBtnDoHtmlClicked" />
+              </widget>
+              <packing>
+                <property name="TopAttach">10</property>
+                <property name="BottomAttach">11</property>
+                <property name="LeftAttach">1</property>
+                <property name="RightAttach">2</property>
+                <property name="AutoSize">True</property>
+                <property name="XOptions">Fill</property>
+                <property name="YOptions">Fill</property>
+                <property name="XExpand">False</property>
+                <property name="XFill">True</property>
+                <property name="XShrink">False</property>
+                <property name="YExpand">False</property>
+                <property name="YFill">True</property>
+                <property name="YShrink">False</property>
+              </packing>
+            </child>
             <child>
               <widget class="Gtk.ComboBox" id="cbxCompounded">
                 <property name="MemberName" />
@@ -67,11 +92,29 @@ By the "tick"</property>
                 <signal name="Changed" handler="OnCbxCompoundedChanged" />
               </widget>
               <packing>
-                <property name="TopAttach">13</property>
-                <property name="BottomAttach">14</property>
+                <property name="TopAttach">14</property>
+                <property name="BottomAttach">15</property>
                 <property name="LeftAttach">1</property>
                 <property name="RightAttach">2</property>
                 <property name="XPadding">10</property>
+                <property name="AutoSize">True</property>
+                <property name="XOptions">Fill</property>
+                <property name="YOptions">Fill</property>
+                <property name="XExpand">False</property>
+                <property name="XFill">True</property>
+                <property name="XShrink">False</property>
+                <property name="YExpand">False</property>
+                <property name="YFill">True</property>
+                <property name="YShrink">False</property>
+              </packing>
+            </child>
+            <child>
+              <widget class="Gtk.HSeparator" id="hseparator1">
+                <property name="MemberName" />
+              </widget>
+              <packing>
+                <property name="TopAttach">10</property>
+                <property name="BottomAttach">11</property>
                 <property name="AutoSize">True</property>
                 <property name="XOptions">Fill</property>
                 <property name="YOptions">Fill</property>
@@ -170,8 +213,8 @@ By the "tick"</property>
                 <property name="LabelProp" translatable="yes">Compounded</property>
               </widget>
               <packing>
-                <property name="TopAttach">13</property>
-                <property name="BottomAttach">14</property>
+                <property name="TopAttach">14</property>
+                <property name="BottomAttach">15</property>
                 <property name="AutoSize">True</property>
                 <property name="XOptions">Fill</property>
                 <property name="YOptions">Fill</property>
@@ -253,8 +296,8 @@ By the "tick"</property>
                 <property name="LabelProp" translatable="yes">Interest Owed Parameters</property>
               </widget>
               <packing>
-                <property name="TopAttach">10</property>
-                <property name="BottomAttach">11</property>
+                <property name="TopAttach">11</property>
+                <property name="BottomAttach">12</property>
                 <property name="RightAttach">2</property>
                 <property name="XPadding">10</property>
                 <property name="AutoSize">True</property>
@@ -275,8 +318,8 @@ By the "tick"</property>
                 <property name="LabelProp" translatable="yes">Interest periods (in years)</property>
               </widget>
               <packing>
-                <property name="TopAttach">11</property>
-                <property name="BottomAttach">12</property>
+                <property name="TopAttach">12</property>
+                <property name="BottomAttach">13</property>
                 <property name="AutoSize">True</property>
                 <property name="XOptions">Fill</property>
                 <property name="YOptions">Fill</property>
@@ -295,8 +338,8 @@ By the "tick"</property>
                 <property name="LabelProp" translatable="yes">Interest rate (x 100 = %)</property>
               </widget>
               <packing>
-                <property name="TopAttach">12</property>
-                <property name="BottomAttach">13</property>
+                <property name="TopAttach">13</property>
+                <property name="BottomAttach">14</property>
                 <property name="AutoSize">True</property>
                 <property name="XOptions">Fill</property>
                 <property name="YOptions">Fill</property>
@@ -315,8 +358,8 @@ By the "tick"</property>
                 <property name="LabelProp" translatable="yes">Interest Owed Results</property>
               </widget>
               <packing>
-                <property name="TopAttach">14</property>
-                <property name="BottomAttach">15</property>
+                <property name="TopAttach">15</property>
+                <property name="BottomAttach">16</property>
                 <property name="RightAttach">2</property>
                 <property name="XPadding">10</property>
                 <property name="AutoSize">True</property>
@@ -375,8 +418,8 @@ By the "tick"</property>
                 <property name="LabelProp" translatable="yes">Total interest and principal</property>
               </widget>
               <packing>
-                <property name="TopAttach">16</property>
-                <property name="BottomAttach">17</property>
+                <property name="TopAttach">17</property>
+                <property name="BottomAttach">18</property>
                 <property name="AutoSize">True</property>
                 <property name="XOptions">Fill</property>
                 <property name="YOptions">Fill</property>
@@ -395,8 +438,8 @@ By the "tick"</property>
                 <property name="LabelProp" translatable="yes">Total interest on money lent out</property>
               </widget>
               <packing>
-                <property name="TopAttach">15</property>
-                <property name="BottomAttach">16</property>
+                <property name="TopAttach">16</property>
+                <property name="BottomAttach">17</property>
                 <property name="AutoSize">True</property>
                 <property name="XOptions">Fill</property>
                 <property name="YOptions">Fill</property>
@@ -580,8 +623,8 @@ By the "tick"</property>
                 <signal name="ValueChanged" handler="OnSbInterestPeriodsValueChanged" />
               </widget>
               <packing>
-                <property name="TopAttach">11</property>
-                <property name="BottomAttach">12</property>
+                <property name="TopAttach">12</property>
+                <property name="BottomAttach">13</property>
                 <property name="LeftAttach">1</property>
                 <property name="RightAttach">2</property>
                 <property name="XPadding">10</property>
@@ -609,8 +652,8 @@ By the "tick"</property>
                 <signal name="ValueChanged" handler="OnSbInterestRateValueChanged" />
               </widget>
               <packing>
-                <property name="TopAttach">12</property>
-                <property name="BottomAttach">13</property>
+                <property name="TopAttach">13</property>
+                <property name="BottomAttach">14</property>
                 <property name="LeftAttach">1</property>
                 <property name="RightAttach">2</property>
                 <property name="XPadding">10</property>
@@ -695,8 +738,8 @@ By the "tick"</property>
                 <property name="Numeric">True</property>
               </widget>
               <packing>
-                <property name="TopAttach">16</property>
-                <property name="BottomAttach">17</property>
+                <property name="TopAttach">17</property>
+                <property name="BottomAttach">18</property>
                 <property name="LeftAttach">1</property>
                 <property name="RightAttach">2</property>
                 <property name="XPadding">10</property>
@@ -723,8 +766,8 @@ By the "tick"</property>
                 <property name="Numeric">True</property>
               </widget>
               <packing>
-                <property name="TopAttach">15</property>
-                <property name="BottomAttach">16</property>
+                <property name="TopAttach">16</property>
+                <property name="BottomAttach">17</property>
                 <property name="LeftAttach">1</property>
                 <property name="RightAttach">2</property>
                 <property name="XPadding">10</property>
